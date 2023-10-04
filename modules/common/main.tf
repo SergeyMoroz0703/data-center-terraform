@@ -61,3 +61,40 @@ resource "kubernetes_namespace" "products" {
     name = var.namespace
   }
 }
+
+resource "kubernetes_pod" "dcapt_exec" {
+  count      = var.start_test_pod ? 1 : 0
+  depends_on = [kubernetes_namespace.products]
+  metadata {
+    name      = "dcapt"
+    namespace = var.namespace
+  }
+  spec {
+    restart_policy = "Always"
+    volume {
+      name = "data"
+      empty_dir {}
+    }
+    container {
+      name    = "dcapt"
+      image   = "${var.test_pod_image_repo}:${var.test_pod_image_tag}"
+      command = ["/bin/bash"]
+      args    = ["-c", "sleep infinity"]
+      volume_mount {
+        mount_path = "/dc-app-performance-toolkit/app"
+        name       = "data"
+      }
+      resources {
+        requests = {
+          cpu    = var.test_pod_cpu_request
+          memory = var.test_pod_mem_request
+        }
+        limits = {
+          cpu    = var.test_pod_cpu_limit
+          memory = var.test_pod_mem_limit
+        }
+      }
+    }
+  }
+}
+
