@@ -80,6 +80,7 @@ resource "kubernetes_pod" "dcapt_exec" {
       image   = "${var.test_pod_image_repo}:${var.test_pod_image_tag}"
       command = ["/bin/bash"]
       args    = ["-c", "sleep infinity"]
+      security_context { privileged = true }
       volume_mount {
         mount_path = "/dc-app-performance-toolkit/app"
         name       = "data"
