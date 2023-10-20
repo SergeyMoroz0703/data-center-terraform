@@ -75,6 +75,7 @@ resource "kubernetes_pod" "dcapt_exec" {
       name = "data"
       empty_dir {}
     }
+    termination_grace_period_seconds = 0
     container {
       name    = "dcapt"
       image   = "${var.test_pod_image_repo}:${var.test_pod_image_tag}"
