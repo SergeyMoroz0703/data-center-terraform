@@ -62,39 +62,61 @@ resource "kubernetes_namespace" "products" {
   }
 }
 
-resource "kubernetes_pod" "dcapt_exec" {
-  count      = var.start_test_pod ? 1 : 0
+resource "kubernetes_deployment" "dcapt_exec" {
+  count      = var.start_test_deployment ? 1 : 0
   depends_on = [kubernetes_namespace.products]
   metadata {
     name      = "dcapt"
     namespace = var.namespace
+    labels = {
+      exec = "true"
+    }
   }
   spec {
-    restart_policy = "Always"
-    volume {
-      name = "data"
-      empty_dir {}
-    }
-    termination_grace_period_seconds = 0
-    container {
-      name    = "dcapt"
-      image   = "${var.test_pod_image_repo}:${var.test_pod_image_tag}"
-      command = ["/bin/bash"]
-      args    = ["-c", "sleep infinity"]
-      security_context { privileged = true }
-      volume_mount {
-        mount_path = "/dc-app-performance-toolkit/app"
-        name       = "data"
+    replicas = 1
+    selector {
+      match_labels = {
+        exec = "true"
       }
-      resources {
-        requests = {
-          cpu    = var.test_pod_cpu_request
-          memory = var.test_pod_mem_request
+    }
+    template {
+      metadata {
+        labels = {
+          exec = "true"
         }
-        limits = {
-          cpu    = var.test_pod_cpu_limit
-          memory = var.test_pod_mem_limit
+      }
+      spec {
+        container {
+          name  = "dcapt"
+          image = "${var.test_deployment_image_repo}:${var.test_deployment_image_tag}"
+          security_context { privileged = true }
+          volume_mount {
+            mount_path = "/data"
+            name       = "data"
+          }
+          resources {
+            requests = {
+              cpu    = var.test_deployment_cpu_request
+              memory = var.test_deployment_mem_request
+            }
+            limits = {
+              cpu    = var.test_deployment_cpu_limit
+              memory = var.test_deployment_mem_limit
+            }
+          }
+          lifecycle {
+            post_start {
+              exec {
+                command = ["/bin/sh", "-c", "apk add --update vim bash git"]
+              }
+            }
+          }
         }
+        volume {
+          name = "data"
+          empty_dir {}
+        }
+        termination_grace_period_seconds = 0
       }
     }
   }

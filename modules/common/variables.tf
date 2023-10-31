@@ -176,43 +176,43 @@ variable "monitoring_custom_values_file" {
   default     = ""
 }
 
-variable "start_test_pod" {
+variable "start_test_deployment" {
   description = "Whether to start a test pod with dcapt tooling"
   type        = bool
   default     = true
 }
 
-variable "test_pod_cpu_request" {
+variable "test_deployment_cpu_request" {
   description = "Number of CPUs for a test pod"
   type        = string
   default     = "1"
 }
 
-variable "test_pod_mem_request" {
+variable "test_deployment_mem_request" {
   description = "Amount of memory for a test pod"
   type        = string
   default     = "4Gi"
 }
 
-variable "test_pod_cpu_limit" {
+variable "test_deployment_cpu_limit" {
   description = "CPU limit for a test pod"
   type        = string
   default     = "4"
 }
 
-variable "test_pod_mem_limit" {
+variable "test_deployment_mem_limit" {
   description = "Memory limit for a test pod"
   type        = string
   default     = "6Gi"
 }
 
-variable "test_pod_image_repo" {
+variable "test_deployment_image_repo" {
   description = "Image repository of a test pod"
   type        = string
   default     = "atlassian/dcapt"
 }
 
-variable "test_pod_image_tag" {
+variable "test_deployment_image_tag" {
   description = "Image tag of a test pod"
   type        = string
   default     = "latest"
